@@ -256,7 +256,7 @@ import os
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Brand Suggester | Moving Walls", page_icon="🏢")
 
-# --- CUSTOM CSS (Maintaining your High-End UI style) ---
+# --- CUSTOM CSS ---
 st.markdown("""
     <style>
     .main { background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); }

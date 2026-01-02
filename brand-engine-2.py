@@ -256,33 +256,36 @@ import os
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Brand Suggester | Moving Walls", page_icon="🏢", layout="centered")
 
-# --- CUSTOM CSS (Enhanced for a fuller look) ---
+# --- CUSTOM CSS (Optimized for Visibility) ---
 st.markdown("""
     <style>
-    /* Gradient Background for the whole page */
+    /* Change background to solid white for maximum clarity */
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background-color: #FFFFFF !important;
     }
     
-    /* Main container styling */
-    .main-card {
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    /* Darken standard text for readability */
+    html, body, [class*="st-"] {
+        color: #202124;
+    }
+
+    /* Make headers more prominent */
+    h1, h2, h3 {
+        color: #1a73e8 !important;
     }
 
     .stTextInput > div > div > input {
         border-radius: 14px;
         padding: 16px;
-        border: 2px solid #e0e0e0;
-        background-color: white !important;
+        border: 2px solid #d1d9e6;
+        background-color: #f8f9fa !important;
+        color: #202124 !important;
     }
     
-    /* New Feature: Quick Action Chips */
     .chip-label {
         font-size: 12px;
-        color: #888;
+        color: #5f6368;
+        font-weight: 600;
         margin-bottom: 10px;
         display: block;
     }
@@ -294,19 +297,19 @@ st.markdown("""
         font-size: 12px;
         float: right;
     }
-    .high-match { background-color: #e6f4ea; color: #34a853; }
-    .mid-match { background-color: #fff4e5; color: #fbbc05; }
+    .high-match { background-color: #e6f4ea; color: #1e7e34; }
+    .mid-match { background-color: #fff4e5; color: #b05d00; }
     
+    /* Footer box with high contrast */
     .info-box {
-        background-color: rgba(255, 255, 255, 0.8) !important;
+        background-color: #f1f3f4 !important;
         padding: 20px;
         border-radius: 16px;
-        border: 1px solid #d1d9e6;
+        border: 1px solid #dee2e6;
         font-size: 14px;
         color: #202124 !important;
         margin-top: 30px;
         line-height: 1.6;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     .info-box strong { color: #1a73e8; }
     </style>
@@ -327,7 +330,7 @@ def load_brands():
 
 BRAND_DATABASE = load_brands()
 
-# --- SIDEBAR (New: Makes UI feel fuller) ---
+# --- SIDEBAR ---
 with st.sidebar:
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=200)
     st.markdown("---")
@@ -357,7 +360,7 @@ s3.metric("Match Engine", "RapidFuzz")
 
 st.markdown("---")
 
-# --- QUICK SEARCH (New: Fills empty space) ---
+# --- QUICK SEARCH ---
 st.markdown('<span class="chip-label">QUICK DISCOVERY</span>', unsafe_allow_html=True)
 q_col1, q_col2, q_col3, q_col4 = st.columns(4)
 quick_brands = ["Nike", "Tesla", "Apple", "Google"]
@@ -365,7 +368,7 @@ cols = [q_col1, q_col2, q_col3, q_col4]
 
 for i, b in enumerate(quick_brands):
     if cols[i].button(f"🔍 {b}", key=f"btn_{b}"):
-        st.session_state.search_input = b # This will pre-fill the box
+        st.session_state.search_input = b
 
 # --- SEARCH HISTORY LOGIC ---
 if 'history' not in st.session_state:
@@ -403,7 +406,7 @@ if len(query) >= 2:
                 c1.markdown(f"**{item['brand']}**")
                 c2.markdown(f'<span class="score-badge {badge_type}">{round(item["score"])}% Match</span>', unsafe_allow_html=True)
                 
-                if st.button(f"Select {item['brand']}", key=item['brand']):
+                if st.button(f"Select {item['brand']}", key=f"sel_{item['brand']}"):
                     add_to_history(item['brand'])
                     st.success(f"Selected {item['brand']}")
 
@@ -425,6 +428,6 @@ st.markdown("""
     </div>
     <br>
     <center>
-        <small style="color: #5f6368;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
+        <small style="color: #202124; font-weight: 500;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
     </center>
     """, unsafe_allow_html=True)

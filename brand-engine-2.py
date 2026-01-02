@@ -311,7 +311,7 @@ with col2:
 # Dashboard Cards
 s1, s2 = st.columns(2)
 s1.metric("Total Brands", len(BRAND_DATABASE))
-# s2.metric("System Status", "Active")
+s2.metric("System Status", "Active")
 
 # --- SEARCH HISTORY LOGIC ---
 if 'history' not in st.session_state:

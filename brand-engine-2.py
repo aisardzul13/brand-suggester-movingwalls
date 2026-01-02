@@ -256,62 +256,90 @@ import os
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Brand Suggester | Moving Walls", page_icon="🏢", layout="centered")
 
-# --- CUSTOM CSS (Optimized for Visibility) ---
+# --- CUSTOM CSS (Visibility and Contrast Fix) ---
 st.markdown("""
     <style>
-    /* Change background to solid white for maximum clarity */
+    /* Main Background - Clean Light Gray for high contrast */
     .stApp {
-        background-color: #FFFFFF !important;
+        background-color: #f4f7fa !important;
     }
     
-    /* Darken standard text for readability */
+    /* Global Text Color - Deep Blue/Black for visibility */
     html, body, [class*="st-"] {
-        color: #202124;
+        color: #1c2b39 !important;
     }
 
-    /* Make headers more prominent */
+    /* Headings */
     h1, h2, h3 {
-        color: #1a73e8 !important;
+        color: #003366 !important;
+        font-weight: 800 !important;
     }
 
+    /* Input Box styling */
     .stTextInput > div > div > input {
-        border-radius: 14px;
-        padding: 16px;
-        border: 2px solid #d1d9e6;
-        background-color: #f8f9fa !important;
-        color: #202124 !important;
+        border-radius: 12px;
+        padding: 15px;
+        border: 2px solid #003366;
+        background-color: #ffffff !important;
+        color: #1c2b39 !important;
     }
     
-    .chip-label {
-        font-size: 12px;
-        color: #5f6368;
-        font-weight: 600;
-        margin-bottom: 10px;
-        display: block;
+    /* Quick Discovery Button styling - Dark Blue with White Text */
+    div.stButton > button {
+        background-color: #003366 !important;
+        color: white !important;
+        border-radius: 10px !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        font-weight: 600 !important;
+        width: 100% !important;
+    }
+    
+    div.stButton > button:hover {
+        background-color: #0055aa !important;
+        color: white !important;
     }
 
+    /* Labels */
+    .chip-label {
+        font-size: 14px;
+        color: #003366;
+        font-weight: 700;
+        margin-bottom: 15px;
+        display: block;
+        text-transform: uppercase;
+    }
+
+    /* Matching Badges */
     .score-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
+        padding: 6px 14px;
+        border-radius: 25px;
         font-weight: 700;
         font-size: 12px;
         float: right;
     }
-    .high-match { background-color: #e6f4ea; color: #1e7e34; }
-    .mid-match { background-color: #fff4e5; color: #b05d00; }
+    .high-match { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .mid-match { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
     
-    /* Footer box with high contrast */
+    /* Footer Info Box styling */
     .info-box {
-        background-color: #f1f3f4 !important;
-        padding: 20px;
-        border-radius: 16px;
-        border: 1px solid #dee2e6;
-        font-size: 14px;
-        color: #202124 !important;
-        margin-top: 30px;
+        background-color: #ffffff !important;
+        padding: 25px;
+        border-radius: 18px;
+        border: 2px solid #003366;
+        font-size: 15px;
+        color: #1c2b39 !important;
+        margin-top: 40px;
         line-height: 1.6;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
-    .info-box strong { color: #1a73e8; }
+    .info-box strong { color: #003366; }
+    
+    /* Metric styling */
+    [data-testid="stMetricValue"] {
+        color: #003366 !important;
+        font-weight: 700 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -319,6 +347,7 @@ st.markdown("""
 @st.cache_data
 def load_brands():
     CSV_FILE = 'brands.csv'
+    # Default sample list if CSV is missing
     default_brands = ["Nike", "Adidas", "Apple", "Amazon", "Tesla", "Microsoft", "Google", "Samsung", "Moving Walls"]
     if os.path.exists(CSV_FILE):
         try:
@@ -335,7 +364,7 @@ with st.sidebar:
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=200)
     st.markdown("---")
     st.markdown("### 🛠 How to use")
-    st.info("""
+    st.markdown("""
     1. **Type** at least 2 letters of a brand.
     2. **View** the Top 2 fuzzy matches.
     3. **Click** 'Select' to save it to your local history.
@@ -350,6 +379,7 @@ with col1:
     st.title("Hello, Welcome to Brand Suggester")
     st.caption("Intelligent brand discovery by Moving Walls")
 with col2:
+    # Fallback to local image if URL fails
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=150)
 
 # Dashboard Cards
@@ -361,7 +391,7 @@ s3.metric("Match Engine", "RapidFuzz")
 st.markdown("---")
 
 # --- QUICK SEARCH ---
-st.markdown('<span class="chip-label">QUICK DISCOVERY</span>', unsafe_allow_html=True)
+st.markdown('<span class="chip-label">Quick Discovery</span>', unsafe_allow_html=True)
 q_col1, q_col2, q_col3, q_col4 = st.columns(4)
 quick_brands = ["Nike", "Tesla", "Apple", "Google"]
 cols = [q_col1, q_col2, q_col3, q_col4]
@@ -402,7 +432,7 @@ if len(query) >= 2:
             badge_type = "high-match" if item['score'] >= 80 else "mid-match"
             
             with st.container():
-                c1, c2 = st.columns([4, 1])
+                c1, c2 = st.columns([4, 1.5])
                 c1.markdown(f"**{item['brand']}**")
                 c2.markdown(f'<span class="score-badge {badge_type}">{round(item["score"])}% Match</span>', unsafe_allow_html=True)
                 
@@ -415,7 +445,7 @@ if st.session_state.history:
     st.divider()
     h_col1, h_col2 = st.columns([4, 1])
     h_col1.write("**Recent Searches**")
-    if h_col2.button("Clear History"):
+    if h_col2.button("Clear History", key="clear_hist"):
         st.session_state.history = []
         st.rerun()
     
@@ -428,6 +458,6 @@ st.markdown("""
     </div>
     <br>
     <center>
-        <small style="color: #202124; font-weight: 500;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
+        <small style="color: #1c2b39; font-weight: 600;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
     </center>
     """, unsafe_allow_html=True)

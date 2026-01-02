@@ -366,7 +366,7 @@ if st.session_state.history:
     
     st.write(" / ".join([f"`{h}`" for h in st.session_state.history]))
 
-# --- FOOTER (Enhanced Visibility Version) ---
+# --- FOOTER (Enhanced version) ---
 st.markdown("""
     <style>
     .info-box {

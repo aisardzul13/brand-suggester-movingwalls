@@ -254,17 +254,39 @@ import pandas as pd
 import os
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="Brand Suggester | Moving Walls", page_icon="🏢")
+st.set_page_config(page_title="Brand Suggester | Moving Walls", page_icon="🏢", layout="centered")
 
-# --- CUSTOM CSS ---
+# --- CUSTOM CSS (Enhanced for a fuller look) ---
 st.markdown("""
     <style>
-    .main { background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); }
+    /* Gradient Background for the whole page */
+    .stApp {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    /* Main container styling */
+    .main-card {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
     .stTextInput > div > div > input {
         border-radius: 14px;
         padding: 16px;
         border: 2px solid #e0e0e0;
+        background-color: white !important;
     }
+    
+    /* New Feature: Quick Action Chips */
+    .chip-label {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 10px;
+        display: block;
+    }
+
     .score-badge {
         padding: 4px 12px;
         border-radius: 20px;
@@ -274,14 +296,19 @@ st.markdown("""
     }
     .high-match { background-color: #e6f4ea; color: #34a853; }
     .mid-match { background-color: #fff4e5; color: #fbbc05; }
+    
     .info-box {
-        background: rgba(255,255,255,0.4);
+        background-color: rgba(255, 255, 255, 0.8) !important;
         padding: 20px;
         border-radius: 16px;
-        font-size: 13px;
-        color: #666;
+        border: 1px solid #d1d9e6;
+        font-size: 14px;
+        color: #202124 !important;
         margin-top: 30px;
+        line-height: 1.6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
+    .info-box strong { color: #1a73e8; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -300,6 +327,20 @@ def load_brands():
 
 BRAND_DATABASE = load_brands()
 
+# --- SIDEBAR (New: Makes UI feel fuller) ---
+with st.sidebar:
+    st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=200)
+    st.markdown("---")
+    st.markdown("### 🛠 How to use")
+    st.info("""
+    1. **Type** at least 2 letters of a brand.
+    2. **View** the Top 2 fuzzy matches.
+    3. **Click** 'Select' to save it to your local history.
+    """)
+    st.markdown("---")
+    st.markdown("### 📊 Database Info")
+    st.write(f"Currently indexing **{len(BRAND_DATABASE)}** brands.")
+
 # --- HEADER & STATS ---
 col1, col2 = st.columns([3, 1])
 with col1:
@@ -309,9 +350,22 @@ with col2:
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=150)
 
 # Dashboard Cards
-s1, s2 = st.columns(2)
+s1, s2, s3 = st.columns(3)
 s1.metric("Total Brands", len(BRAND_DATABASE))
 s2.metric("System Status", "Active")
+s3.metric("Match Engine", "RapidFuzz")
+
+st.markdown("---")
+
+# --- QUICK SEARCH (New: Fills empty space) ---
+st.markdown('<span class="chip-label">QUICK DISCOVERY</span>', unsafe_allow_html=True)
+q_col1, q_col2, q_col3, q_col4 = st.columns(4)
+quick_brands = ["Nike", "Tesla", "Apple", "Google"]
+cols = [q_col1, q_col2, q_col3, q_col4]
+
+for i, b in enumerate(quick_brands):
+    if cols[i].button(f"🔍 {b}", key=f"btn_{b}"):
+        st.session_state.search_input = b # This will pre-fill the box
 
 # --- SEARCH HISTORY LOGIC ---
 if 'history' not in st.session_state:
@@ -335,7 +389,6 @@ if len(query) >= 2:
         if score > 45:
             suggestions.append({"brand": brand, "score": score})
 
-    # SORT & LIMIT TO TOP 2
     final_results = sorted(suggestions, key=lambda x: x['score'], reverse=True)[:2]
 
     if not final_results:
@@ -345,7 +398,6 @@ if len(query) >= 2:
         for item in final_results:
             badge_type = "high-match" if item['score'] >= 80 else "mid-match"
             
-            # Row Layout
             with st.container():
                 c1, c2 = st.columns([4, 1])
                 c1.markdown(f"**{item['brand']}**")
@@ -366,25 +418,8 @@ if st.session_state.history:
     
     st.write(" / ".join([f"`{h}`" for h in st.session_state.history]))
 
-# --- FOOTER (Enhanced version) ---
+# --- FOOTER ---
 st.markdown("""
-    <style>
-    .info-box {
-        background-color: rgba(255, 255, 255, 0.8) !important; /* Brighter, more solid white */
-        padding: 20px;
-        border-radius: 16px;
-        border: 1px solid #d1d9e6; /* Suble border to define the shape */
-        font-size: 14px;
-        color: #202124 !important; /* Darker text for high contrast */
-        margin-top: 30px;
-        line-height: 1.6;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Soft shadow for depth */
-    }
-    .info-box strong {
-        color: #1a73e8; /* Moving Walls Blue for the lightbulb text */
-    }
-    </style>
-    
     <div class="info-box">
         <strong>💡 Pro Tip:</strong> Our engine uses <b>RapidFuzz</b> logic. This means it can find brands even if you misspell them or miss a few letters. Top 2 results are shown based on the highest matching percentage.
     </div>

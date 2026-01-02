@@ -363,7 +363,7 @@ with st.sidebar:
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=200)
     st.markdown("---")
     st.markdown("### 🛠 How to use")
-    st.info("1. **Type** at least 2 letters.\n2. **View** results.\n3. **Click** Select.")
+    st.info("1. **Type** at least 2 letters of the brand.\n2. **View** the top 2 results.\n3. **Click** 'Select' to save it to your local history.")
     st.markdown("---")
     st.markdown("### 📊 Database")
     st.write(f"Indexing **{len(BRAND_DATABASE)}** brands.")

@@ -366,11 +366,30 @@ if st.session_state.history:
     
     st.write(" / ".join([f"`{h}`" for h in st.session_state.history]))
 
-# --- FOOTER ---
+# --- FOOTER (Enhanced Visibility Version) ---
 st.markdown("""
+    <style>
+    .info-box {
+        background-color: rgba(255, 255, 255, 0.8) !important; /* Brighter, more solid white */
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid #d1d9e6; /* Suble border to define the shape */
+        font-size: 14px;
+        color: #202124 !important; /* Darker text for high contrast */
+        margin-top: 30px;
+        line-height: 1.6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Soft shadow for depth */
+    }
+    .info-box strong {
+        color: #1a73e8; /* Moving Walls Blue for the lightbulb text */
+    }
+    </style>
+    
     <div class="info-box">
-        <strong>💡 Pro Tip:</strong> Our engine uses RapidFuzz logic. It finds brands even with typos. 
-        Top 2 results are shown based on the highest matching percentage.
+        <strong>💡 Pro Tip:</strong> Our engine uses <b>RapidFuzz</b> logic. This means it can find brands even if you misspell them or miss a few letters. Top 2 results are shown based on the highest matching percentage.
     </div>
-    <br><center><small>© 2026 Moving Walls Media Technology Group</small></center>
+    <br>
+    <center>
+        <small style="color: #5f6368;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
+    </center>
     """, unsafe_allow_html=True)

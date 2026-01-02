@@ -303,7 +303,7 @@ BRAND_DATABASE = load_brands()
 # --- HEADER & STATS ---
 col1, col2 = st.columns([3, 1])
 with col1:
-    st.title("Brand Suggester")
+    st.title("Hi, Welcome to Brand Suggester")
     st.caption("Intelligent brand discovery by Moving Walls")
 with col2:
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=150)

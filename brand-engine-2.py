@@ -323,7 +323,7 @@ def add_to_history(brand):
         st.session_state.history = st.session_state.history[:5]
 
 # --- MAIN SEARCH ---
-query = st.text_input("Start typing (e.g., nkee)...", key="search_input")
+query = st.text_input("Please start typing (e.g., nkee)...", key="search_input")
 
 if len(query) >= 2:
     suggestions = []

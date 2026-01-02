@@ -256,55 +256,54 @@ import os
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Brand Suggester | Moving Walls", page_icon="🏢", layout="centered")
 
-# --- CUSTOM CSS (Optimized for Dark Mode Visibility) ---
+# --- CUSTOM CSS (Visibility and Dark Mode Fixes) ---
 st.markdown("""
     <style>
-    /* 1. Main Background - Deep Slate/Black */
+    /* Ensure the app background is deep dark */
     .stApp {
         background-color: #0E1117 !important;
     }
     
-    /* 2. Global Text Color - Pure White & Off-White for contrast */
-    html, body, [class*="st-"], .stMarkdown, p, span {
+    /* Force all text to be visible (White/Off-white) */
+    html, body, [class*="st-"], .stMarkdown, p, span, label {
         color: #E0E0E0 !important;
     }
 
-    /* 3. Metrics and Headers - Neon Blue for pop */
+    /* Vibrant Blue for Headers and Metrics */
     h1, h2, h3, [data-testid="stMetricValue"] {
-        color: #4D96FF !important;
+        color: #58A6FF !important;
         font-weight: 800 !important;
     }
     
     [data-testid="stMetricLabel"] p {
-        color: #9BA4B5 !important;
+        color: #8B949E !important;
     }
 
-    /* 4. Input Box - Dark background with Bright border */
+    /* Input Box: Dark with high-contrast border */
     .stTextInput > div > div > input {
         border-radius: 12px;
         padding: 15px;
-        border: 2px solid #4D96FF !important;
-        background-color: #1A1C24 !important;
+        border: 2px solid #58A6FF !important;
+        background-color: #161B22 !important;
         color: #FFFFFF !important;
     }
     
-    /* 5. Buttons - Vibrant Blue with White Text */
+    /* Buttons: Strong Blue with White Text for visibility */
     div.stButton > button {
-        background-color: #4D96FF !important;
+        background-color: #238636 !important; /* Success Green for Select buttons */
         color: #FFFFFF !important;
         border-radius: 10px !important;
         border: none !important;
         font-weight: 700 !important;
         width: 100% !important;
-        transition: 0.3s;
     }
     
-    div.stButton > button:hover {
-        background-color: #00D7FF !important;
-        box-shadow: 0 0 15px rgba(77, 150, 255, 0.4);
+    /* Quick Discovery Buttons specific color */
+    [data-testid="stHorizontalBlock"] div.stButton > button {
+        background-color: #1F6FEB !important; 
     }
 
-    /* 6. Matching Badges - Glowing colors for Dark Mode */
+    /* Matching Badges: Glowing variants */
     .score-badge {
         padding: 6px 14px;
         border-radius: 25px;
@@ -314,32 +313,32 @@ st.markdown("""
     }
     .high-match { 
         background-color: #1B3C2A !important; 
-        color: #2ECC71 !important; 
-        border: 1px solid #2ECC71; 
+        color: #39D353 !important; 
+        border: 1px solid #39D353; 
     }
     .mid-match { 
         background-color: #3C301B !important; 
-        color: #F1C40F !important; 
-        border: 1px solid #F1C40F; 
+        color: #E3B341 !important; 
+        border: 1px solid #E3B341; 
     }
     
-    /* 7. Footer Info Box - Slightly lighter than background to stand out */
+    /* Footer Info Box: Slate contrast */
     .info-box {
-        background-color: #1A1C24 !important;
+        background-color: #161B22 !important;
         padding: 25px;
         border-radius: 18px;
-        border: 1px solid #4D96FF;
+        border: 1px solid #30363D;
         font-size: 15px;
-        color: #E0E0E0 !important;
+        color: #C9D1D9 !important;
         margin-top: 40px;
         line-height: 1.6;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-    .info-box strong { color: #4D96FF; }
+    .info-box strong { color: #58A6FF; }
 
-    /* 8. Divider */
-    hr {
-        border-color: #4D96FF !important;
-        opacity: 0.3;
+    /* Red for Clear History button */
+    [data-testid="stHeader"] + div button:active, #clear_hist {
+        background-color: #DA3633 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -364,7 +363,7 @@ with st.sidebar:
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=200)
     st.markdown("---")
     st.markdown("### 🛠 How to use")
-    st.info("1. **Type** at least 2 letters of the brand.\n2. **View** top 2 results.\n3. **Click** 'Select' to save it to your local history.")
+    st.info("1. **Type** at least 2 letters.\n2. **View** results.\n3. **Click** Select.")
     st.markdown("---")
     st.markdown("### 📊 Database")
     st.write(f"Indexing **{len(BRAND_DATABASE)}** brands.")
@@ -386,7 +385,7 @@ s3.metric("Match Engine", "RapidFuzz")
 st.markdown("---")
 
 # --- QUICK SEARCH ---
-st.markdown('<p style="color:#9BA4B5; font-weight:700; font-size:12px;">QUICK DISCOVERY</p>', unsafe_allow_html=True)
+st.markdown('<p style="color:#8B949E; font-weight:700; font-size:12px; letter-spacing:1px;">QUICK DISCOVERY</p>', unsafe_allow_html=True)
 q_col1, q_col2, q_col3, q_col4 = st.columns(4)
 quick_brands = ["Nike", "Tesla", "Apple", "Google"]
 cols = [q_col1, q_col2, q_col3, q_col4]
@@ -435,12 +434,23 @@ if len(query) >= 2:
                     add_to_history(item['brand'])
                     st.success(f"Selected {item['brand']}")
 
-# --- HISTORY SECTION ---
+# --- HISTORY SECTION (Now with Download) ---
 if st.session_state.history:
     st.divider()
-    h_col1, h_col2 = st.columns([4, 1])
+    h_col1, h_col2, h_col3 = st.columns([3, 1, 1])
     h_col1.write("**Recent Searches**")
-    if h_col2.button("Clear History", key="clear_hist"):
+    
+    # 1. Download Feature
+    history_csv = pd.DataFrame(st.session_state.history, columns=["Selected Brands"]).to_csv(index=False)
+    h_col2.download_button(
+        label="📥 Download",
+        data=history_csv,
+        file_name="brand_history.csv",
+        mime="text/csv",
+    )
+    
+    # 2. Clear Feature
+    if h_col3.button("Clear", key="clear_hist"):
         st.session_state.history = []
         st.rerun()
     
@@ -453,6 +463,6 @@ st.markdown("""
     </div>
     <br>
     <center>
-        <small style="color: #9BA4B5; font-weight: 600;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
+        <small style="color: #8B949E; font-weight: 600;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
     </center>
     """, unsafe_allow_html=True)

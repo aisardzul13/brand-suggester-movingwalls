@@ -256,61 +256,55 @@ import os
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Brand Suggester | Moving Walls", page_icon="🏢", layout="centered")
 
-# --- CUSTOM CSS (Visibility and Contrast Fix) ---
+# --- CUSTOM CSS (Optimized for Dark Mode Visibility) ---
 st.markdown("""
     <style>
-    /* Main Background - Clean Light Gray for high contrast */
+    /* 1. Main Background - Deep Slate/Black */
     .stApp {
-        background-color: #f4f7fa !important;
+        background-color: #0E1117 !important;
     }
     
-    /* Global Text Color - Deep Blue/Black for visibility */
-    html, body, [class*="st-"] {
-        color: #1c2b39 !important;
+    /* 2. Global Text Color - Pure White & Off-White for contrast */
+    html, body, [class*="st-"], .stMarkdown, p, span {
+        color: #E0E0E0 !important;
     }
 
-    /* Headings */
-    h1, h2, h3 {
-        color: #003366 !important;
+    /* 3. Metrics and Headers - Neon Blue for pop */
+    h1, h2, h3, [data-testid="stMetricValue"] {
+        color: #4D96FF !important;
         font-weight: 800 !important;
     }
+    
+    [data-testid="stMetricLabel"] p {
+        color: #9BA4B5 !important;
+    }
 
-    /* Input Box styling */
+    /* 4. Input Box - Dark background with Bright border */
     .stTextInput > div > div > input {
         border-radius: 12px;
         padding: 15px;
-        border: 2px solid #003366;
-        background-color: #ffffff !important;
-        color: #1c2b39 !important;
+        border: 2px solid #4D96FF !important;
+        background-color: #1A1C24 !important;
+        color: #FFFFFF !important;
     }
     
-    /* Quick Discovery Button styling - Dark Blue with White Text */
+    /* 5. Buttons - Vibrant Blue with White Text */
     div.stButton > button {
-        background-color: #003366 !important;
-        color: white !important;
+        background-color: #4D96FF !important;
+        color: #FFFFFF !important;
         border-radius: 10px !important;
         border: none !important;
-        padding: 10px 20px !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         width: 100% !important;
+        transition: 0.3s;
     }
     
     div.stButton > button:hover {
-        background-color: #0055aa !important;
-        color: white !important;
+        background-color: #00D7FF !important;
+        box-shadow: 0 0 15px rgba(77, 150, 255, 0.4);
     }
 
-    /* Labels */
-    .chip-label {
-        font-size: 14px;
-        color: #003366;
-        font-weight: 700;
-        margin-bottom: 15px;
-        display: block;
-        text-transform: uppercase;
-    }
-
-    /* Matching Badges */
+    /* 6. Matching Badges - Glowing colors for Dark Mode */
     .score-badge {
         padding: 6px 14px;
         border-radius: 25px;
@@ -318,27 +312,34 @@ st.markdown("""
         font-size: 12px;
         float: right;
     }
-    .high-match { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .mid-match { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .high-match { 
+        background-color: #1B3C2A !important; 
+        color: #2ECC71 !important; 
+        border: 1px solid #2ECC71; 
+    }
+    .mid-match { 
+        background-color: #3C301B !important; 
+        color: #F1C40F !important; 
+        border: 1px solid #F1C40F; 
+    }
     
-    /* Footer Info Box styling */
+    /* 7. Footer Info Box - Slightly lighter than background to stand out */
     .info-box {
-        background-color: #ffffff !important;
+        background-color: #1A1C24 !important;
         padding: 25px;
         border-radius: 18px;
-        border: 2px solid #003366;
+        border: 1px solid #4D96FF;
         font-size: 15px;
-        color: #1c2b39 !important;
+        color: #E0E0E0 !important;
         margin-top: 40px;
         line-height: 1.6;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
-    .info-box strong { color: #003366; }
-    
-    /* Metric styling */
-    [data-testid="stMetricValue"] {
-        color: #003366 !important;
-        font-weight: 700 !important;
+    .info-box strong { color: #4D96FF; }
+
+    /* 8. Divider */
+    hr {
+        border-color: #4D96FF !important;
+        opacity: 0.3;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -347,7 +348,6 @@ st.markdown("""
 @st.cache_data
 def load_brands():
     CSV_FILE = 'brands.csv'
-    # Default sample list if CSV is missing
     default_brands = ["Nike", "Adidas", "Apple", "Amazon", "Tesla", "Microsoft", "Google", "Samsung", "Moving Walls"]
     if os.path.exists(CSV_FILE):
         try:
@@ -364,14 +364,10 @@ with st.sidebar:
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=200)
     st.markdown("---")
     st.markdown("### 🛠 How to use")
-    st.markdown("""
-    1. **Type** at least 2 letters of a brand.
-    2. **View** the Top 2 fuzzy matches.
-    3. **Click** 'Select' to save it to your local history.
-    """)
+    st.info("1. **Type** at least 2 letters.\n2. **View** results.\n3. **Click** Select.")
     st.markdown("---")
-    st.markdown("### 📊 Database Info")
-    st.write(f"Currently indexing **{len(BRAND_DATABASE)}** brands.")
+    st.markdown("### 📊 Database")
+    st.write(f"Indexing **{len(BRAND_DATABASE)}** brands.")
 
 # --- HEADER & STATS ---
 col1, col2 = st.columns([3, 1])
@@ -379,7 +375,6 @@ with col1:
     st.title("Hello, Welcome to Brand Suggester")
     st.caption("Intelligent brand discovery by Moving Walls")
 with col2:
-    # Fallback to local image if URL fails
     st.image("https://www.movingwalls.com/wp-content/uploads/2023/05/cropped-MW-logo-1.png", width=150)
 
 # Dashboard Cards
@@ -391,7 +386,7 @@ s3.metric("Match Engine", "RapidFuzz")
 st.markdown("---")
 
 # --- QUICK SEARCH ---
-st.markdown('<span class="chip-label">Quick Discovery</span>', unsafe_allow_html=True)
+st.markdown('<p style="color:#9BA4B5; font-weight:700; font-size:12px;">QUICK DISCOVERY</p>', unsafe_allow_html=True)
 q_col1, q_col2, q_col3, q_col4 = st.columns(4)
 quick_brands = ["Nike", "Tesla", "Apple", "Google"]
 cols = [q_col1, q_col2, q_col3, q_col4]
@@ -458,6 +453,6 @@ st.markdown("""
     </div>
     <br>
     <center>
-        <small style="color: #1c2b39; font-weight: 600;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
+        <small style="color: #9BA4B5; font-weight: 600;">© 2026 Moving Walls Media Technology Group. All rights reserved.</small>
     </center>
     """, unsafe_allow_html=True)

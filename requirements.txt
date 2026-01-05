@@ -1,3 +1,5 @@
 flask
 rapidfuzz
 pandas
+fastapi
+uvicorn

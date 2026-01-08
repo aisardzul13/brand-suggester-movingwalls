@@ -5,19 +5,10 @@ import os
 
 app = FastAPI(title="Brand Suggester API")
 
-# Reusable logic to load brands (Same as your Streamlit app)
-# def load_brands():
-#     CSV_FILE = 'brands.csv'
-#     if os.path.exists(CSV_FILE):
-#         df = pd.read_csv(CSV_FILE)
-#         return df['brand_name'].tolist()
-#     return ["Nike", "Adidas", "Apple", "Moving Walls"] # Fallback
-
 def load_brands():
     CSV_FILE = 'brands.csv'
     if os.path.exists(CSV_FILE):
         try:
-            # Added encoding='latin1' to handle special characters
             df = pd.read_csv(CSV_FILE, encoding='latin1') 
             return df['brand_name'].tolist()
         except Exception as e:
@@ -27,21 +18,38 @@ def load_brands():
 
 BRAND_DATABASE = load_brands()
 
+@app.get("/")
+def home():
+    return {"status": "Brand Suggester API is running", "version": "1.1.0"}
+
 @app.get("/suggest")
 async def get_suggestions(q: str = Query(..., min_length=2)):
-    """
-    Mobile app calls this: https://your-api.com/suggest?q=nkee
-    """
     suggestions = []
+    query_clean = q.lower().strip()
+
     for brand in BRAND_DATABASE:
-        score = fuzz.ratio(q.lower(), brand.lower())
-        # Apply the same weight logic as your Streamlit app
-        if q.lower() == brand.lower(): score = 100
-        elif q.lower() in brand.lower(): score = max(score, 95)
+        brand_clean = brand.lower().strip()
         
-        if score > 45:
+        # 1. Direct or Partial Match (High Priority)
+        # Ratio: Basic similarity
+        # Partial_ratio: Good for "Apple" in "Apple Inc"
+        ratio_score = fuzz.ratio(query_clean, brand_clean)
+        partial_score = fuzz.partial_ratio(query_clean, brand_clean)
+        
+        # 2. Pick the best score for this brand
+        # This allows "abibas" to hit "adidas" with a high enough score
+        score = max(ratio_score, partial_score)
+
+        # 3. Boost logic (Same as your Streamlit app)
+        if query_clean == brand_clean: 
+            score = 100
+        elif query_clean in brand_clean: 
+            score = max(score, 95)
+        
+        # 4. Threshold: 35 is usually safe for typos like "abibas"
+        if score > 35:
             suggestions.append({"brand": brand, "score": round(score, 2)})
 
-    # Return top 2 results as JSON
-    final_results = sorted(suggestions, key=lambda x: x['score'], reverse=True)[:2]
+    # Return top 2 results sorted by highest score
+    final_results = sorted(suggestions, key=lambda x: x['score'], reverse=True)[:3]
     return {"query": q, "results": final_results}
